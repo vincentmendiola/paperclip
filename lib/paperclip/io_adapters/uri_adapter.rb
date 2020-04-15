@@ -59,6 +59,7 @@ module Paperclip
         destination.write(data)
       end
       src.close
+      src.unlink
       destination.rewind
       destination
     end

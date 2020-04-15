@@ -85,8 +85,16 @@ module Paperclip
           dest: File.expand_path(dst.path),
         )
       rescue Cocaine::ExitStatusError => e
+        dst.close unless dst.closed?
+        dst.unlink if dst.respond_to?(:unlink)
+        src.tempfile.close if src.try(:tempfile) && !src.tempfile.closed?
+        src.tempfile.unlink if src.try(:tempfile).respond_to?(:unlink)
         raise Paperclip::Error, "There was an error processing the thumbnail for #{@basename}" if @whiny
       rescue Cocaine::CommandNotFoundError => e
+        dst.close unless dst.closed?
+        dst.unlink if dst.respond_to?(:unlink)
+        src.tempfile.close if src.try(:tempfile) && !src.tempfile.closed?
+        src.tempfile.unlink if src.try(:tempfile).respond_to?(:unlink)
         raise Paperclip::Errors::CommandNotFoundError.new("Could not run the `convert` command. Please install ImageMagick.")
       end
 
